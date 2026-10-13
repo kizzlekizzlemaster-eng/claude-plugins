@@ -44,6 +44,9 @@
   .report-doc code { font-family: "SF Mono", Menlo, monospace; font-size: 8.4pt;
     background: #eef1e4; padding: .5pt 3pt; border-radius: 2pt; }
   .report-doc strong { font-weight: 700; }
+  /* 강조 — <mark>핵심 숫자</mark>: 연녹색 바탕, 흑백 인쇄에서도 음영으로 보인다 */
+  .report-doc mark { background: #e4ebc9; color: var(--ink); padding: 0 3pt; border-radius: 2pt; font-weight: 700; }
+  .report-doc blockquote strong { color: var(--g); }
   .report-doc a { color: var(--g); word-break: break-all; text-decoration: none; }
   .report-doc img { display: block; max-width: 100%; height: auto; margin: 10pt auto;
     border: .6pt solid var(--line); border-radius: 3pt; page-break-inside: avoid; }
