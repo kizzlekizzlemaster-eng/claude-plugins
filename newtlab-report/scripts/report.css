@@ -60,3 +60,17 @@
   .report-doc.compact th { font-size: 8.2pt; }
   .report-doc.compact h2 { margin: 12pt 0 6pt; }
 }
+
+
+  /* 도식 — ```mermaid 블록. 변환기(md_to_a4_pdf.py)와 ERP 문서 화면이 같이 쓴다. 한 쪽 안에 통째로, 가운데 */
+  .report-doc pre.mermaid { background: none; border: 0; padding: 4pt 0 2pt; margin: 6pt 0 10pt; text-align: center;
+    break-inside: avoid; page-break-inside: avoid; break-after: avoid; page-break-after: avoid; font-size: 10.5pt; line-height: 1.35; overflow: visible; white-space: normal; }
+  .report-doc pre.mermaid svg { max-width: 100%; height: auto; max-height: 120mm; } /* 반 쪽 넘는 그림은 줄여서 한 쪽에 */
+  .report-doc pre.mermaid .nodeLabel, .report-doc pre.mermaid .edgeLabel, .report-doc pre.mermaid text { font-family: inherit; }
+  .report-doc pre.mermaid .edgeLabel { background: #fff; }
+  /* 도식 설명 줄 — 도식 바로 아래 기울임 한 줄 */
+  .report-doc figure.diagram { margin: 6pt 0 10pt; break-inside: avoid; page-break-inside: avoid; }
+  .report-doc figure.diagram pre.mermaid { margin: 0; }
+  .report-doc figure.diagram figcaption { text-align: center; color: #555; font-size: 9.5pt; margin-top: 2pt; }
+  .report-doc pre.mermaid + p { break-before: avoid; page-break-before: avoid; }
+  .report-doc pre.mermaid + p > em:only-child { display: block; text-align: center; color: #555; font-size: 9.5pt; margin-top: -6pt; }

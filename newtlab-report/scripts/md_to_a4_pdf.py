@@ -9,6 +9,7 @@
 - 첫 번째 `# 제목` 이 문서 제목. 옵시디언 머리말(---)은 인쇄에서 뺀다
 - 머리말 옵션: `인쇄: 조밀표` (표를 촘촘히), `인쇄: 원페이지` (2쪽 넘으면 경고)
 - 쪽수를 출력한다. 원페이지 기획은 1쪽인지 여기서 확인한다
+- 도식: ```mermaid 코드 블록을 그림으로 그린다 (vendor/mermaid.min.js, 네트워크 불필요). 못 그리면 경고를 찍는다
 - 준비물: pip3 install markdown, 구글 크롬
 """
 import re
@@ -23,6 +24,23 @@ except ImportError:  # pragma: no cover
 
 HERE = Path(__file__).resolve().parent
 CSS_PATH = HERE / "report.css"
+MERMAID_PATH = HERE / "vendor" / "mermaid.min.js"
+MERMAID_INIT = (
+    "mermaid.initialize({startOnLoad:false,theme:'base',securityLevel:'loose',"
+    "fontFamily:'Pretendard, -apple-system, BlinkMacSystemFont, Apple SD Gothic Neo, sans-serif',"
+    "flowchart:{htmlLabels:true,curve:'basis',padding:8},"
+    "themeVariables:{primaryColor:'#e4ebc9',primaryTextColor:'#1f2a14',primaryBorderColor:'#4e6b2d',"
+    "lineColor:'#4e6b2d',secondaryColor:'#f4f6ec',tertiaryColor:'#ffffff',fontSize:'12px',"
+    "noteBkgColor:'#fff8d6',noteBorderColor:'#c9b45a'}});"
+    # 문법이 틀린 블록은 빼고 그린다. 틀린 수를 body에 적어 두면 변환기가 읽어 경고한다
+    "(async()=>{const els=[...document.querySelectorAll('pre.mermaid')];let bad=0;"
+    "for(const el of els){let ok=false;try{ok=await mermaid.parse(el.textContent,{suppressErrors:true});}catch(e){ok=false;}"
+    "if(!ok){bad++;el.setAttribute('data-bad','1');el.textContent='[도식 문법 오류 — 그리지 못함]\\n'+el.textContent;}}"
+    "document.body.setAttribute('data-mermaid-bad',String(bad));"
+    "try{await mermaid.run({nodes:els.filter(e=>!e.hasAttribute('data-bad'))});}catch(e){}"
+    "document.body.setAttribute('data-mermaid-done','1');})();"
+)
+
 CHROME_CANDIDATES = (
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     "/Applications/Chromium.app/Contents/MacOS/Chromium",
@@ -56,6 +74,36 @@ def _inline_images(body: str, base_dir: Path) -> str:
     return re.sub(r'src="([^"]+)"', repl, body)
 
 
+def _mermaid_blocks(body: str) -> tuple[str, int]:
+    """```mermaid 코드 블록을 mermaid가 그릴 수 있는 <pre class="mermaid">로 바꾼다. 블록 수를 함께 돌려준다."""
+    import html as _html
+
+    count = 0
+
+    def repl(m: re.Match) -> str:
+        nonlocal count
+        count += 1
+        return f'<pre class="mermaid">{_html.unescape(m.group(1))}</pre>'
+
+    body = re.sub(r'<pre><code class="language-mermaid">(.*?)</code></pre>', repl, body, flags=re.S)
+    # 그림 바로 아래 `*그림 n. …*` 한 줄은 그림과 한 덩어리로 묶어 쪽이 갈리지 않게 한다
+    body = re.sub(
+        r'(<pre class="mermaid">.*?</pre>)\s*<p>(<em>.*?</em>)</p>',
+        r'<figure class="diagram">\1<figcaption>\2</figcaption></figure>', body, flags=re.S,
+    )
+    return body, count
+
+
+def _bad_diagrams(chrome: str, html_path: Path) -> int:
+    """크롬으로 DOM을 떠서 문법이 틀려 못 그린 도식 수를 읽는다(-1이면 mermaid가 돌지 않았다)."""
+    r = subprocess.run(
+        [chrome, "--headless=new", "--disable-gpu", "--virtual-time-budget=15000", "--dump-dom", str(html_path)],
+        capture_output=True, text=True,
+    )
+    m = re.search(r'data-mermaid-bad="(\d+)"', r.stdout)
+    return int(m.group(1)) if m else -1
+
+
 def _page_count(pdf: Path) -> int:
     """크롬이 만든 PDF는 페이지 객체가 평문이라 정규식으로 센다 (외부 패키지 불필요)."""
     data = pdf.read_bytes()
@@ -78,14 +126,21 @@ def convert(md_path: Path) -> None:
     m = re.search(r"^#\s+(.+)$", text, re.M)
     title = m.group(1).strip() if m else md_path.stem
 
-    body = markdown.markdown(text, extensions=["tables", "sane_lists", "nl2br"])
+    body = markdown.markdown(text, extensions=["tables", "sane_lists", "nl2br", "fenced_code"])
     body = _inline_images(body, md_path.resolve().parent)
+    body, diagrams = _mermaid_blocks(body)
+    script = ""
+    if diagrams:
+        if not MERMAID_PATH.is_file():
+            print(f"  ⚠ 도식 {diagrams}개가 있는데 {MERMAID_PATH.name} 이 없어 그리지 못합니다.")
+        else:
+            script = f"<script>{MERMAID_PATH.read_text(encoding='utf-8')}</script><script>{MERMAID_INIT}</script>"
     cls = "report-doc compact" if "조밀표" in flags else "report-doc"
     css = CSS_PATH.read_text(encoding="utf-8")
     html = (
         f'<!doctype html><html lang="ko"><head><meta charset="utf-8">'
         f"<title>{title}</title><style>{css}</style></head>"
-        f'<body><div class="{cls}">{body}</div></body></html>'
+        f'<body><div class="{cls}">{body}</div>{script}</body></html>'
     )
 
     # 산출물은 현재 폴더의 pdf/ — 옵시디언 볼트(docs·marketing)에 PDF를 두지 않는다 (2026-08-27 부대표님 지시)
@@ -95,15 +150,27 @@ def convert(md_path: Path) -> None:
     pdf_path = out_dir / f"{md_path.stem}.pdf"
     html_path.write_text(html, encoding="utf-8")
 
-    subprocess.run(
-        [_chrome(), "--headless=new", "--disable-gpu", "--no-pdf-header-footer",
-         f"--print-to-pdf={pdf_path}", str(html_path)],
-        capture_output=True, check=True,
-    )
+    chrome = _chrome()
+    if diagrams and script:
+        bad = _bad_diagrams(chrome, html_path)
+        if bad > 0:
+            print(f"  ⚠ 도식 {diagrams}개 중 {bad}개가 문법이 틀려 그리지 못했습니다. PDF에 '[도식 문법 오류]'로 표시됩니다 — https://mermaid.live 에서 고치세요.")
+        elif bad < 0:
+            print("  ⚠ 도식을 그리는 mermaid가 돌지 않았습니다. 크롬 출력을 확인하세요.")
+    cmd = [chrome, "--headless=new", "--disable-gpu", "--no-pdf-header-footer", "--virtual-time-budget=15000",
+           f"--print-to-pdf={pdf_path}", str(html_path)]
+    for attempt in range(3):
+        pdf_path.unlink(missing_ok=True)
+        r = subprocess.run(cmd, capture_output=True)
+        if pdf_path.is_file() and pdf_path.stat().st_size > 0:
+            break  # 크롬이 PDF를 쓰고도 종료 코드 2를 낼 때가 있어 파일 유무로 판정한다
+        if attempt == 2:
+            sys.exit(f"크롬이 PDF를 만들지 못했습니다 (종료 코드 {r.returncode}). 크롬을 닫고 다시 실행해 보세요.")
     html_path.unlink(missing_ok=True)
     pages = _page_count(pdf_path)
     size = pdf_path.stat().st_size // 1024
-    print(f"  ✓ {md_path.name} → {pdf_path} ({pages}쪽, {size} KB)")
+    extra = f", 도식 {diagrams}개" if diagrams else ""
+    print(f"  ✓ {md_path.name} → {pdf_path} ({pages}쪽, {size} KB{extra})")
     if "원페이지" in flags and pages > 1:
         print(f"  ⚠ 원페이지 기획인데 {pages}쪽입니다. 근거·표를 줄여서 1쪽으로 맞추세요.")
 
