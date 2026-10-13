@@ -5,7 +5,7 @@
 ## 설치 (직원 터미널, 한 번)
 
 ```
-claude plugin marketplace add newtlab-team/claude-plugins
+claude plugin marketplace add kizzlekizzlemaster-eng/claude-plugins
 claude plugin install newtlab-report@newtlab
 pip3 install markdown
 ```
