@@ -28,7 +28,7 @@ MERMAID_PATH = HERE / "vendor" / "mermaid.min.js"
 MERMAID_INIT = (
     "mermaid.initialize({startOnLoad:false,theme:'base',securityLevel:'loose',"
     "fontFamily:'Pretendard, -apple-system, BlinkMacSystemFont, Apple SD Gothic Neo, sans-serif',"
-    "flowchart:{htmlLabels:true,curve:'basis',padding:8},"
+    "flowchart:{htmlLabels:true,curve:'basis',padding:8,wrappingWidth:420},"
     "themeVariables:{primaryColor:'#e4ebc9',primaryTextColor:'#1f2a14',primaryBorderColor:'#4e6b2d',"
     "lineColor:'#4e6b2d',secondaryColor:'#f4f6ec',tertiaryColor:'#ffffff',fontSize:'12px',"
     "noteBkgColor:'#fff8d6',noteBorderColor:'#c9b45a'}});"
