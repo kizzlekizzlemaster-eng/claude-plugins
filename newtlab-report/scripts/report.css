@@ -26,7 +26,8 @@
   .report-doc h3 { font-size: 10.4pt; margin: 13pt 0 5pt; font-weight: 700; color: var(--g); page-break-after: avoid; }
   .report-doc p { margin: 0 0 7pt; }
   .report-doc hr { border: 0; border-top: .8pt solid var(--line); margin: 14pt 0; }
-  .report-doc table { width: 100%; border-collapse: collapse; margin: 6pt 0 10pt; font-size: 9pt; line-height: 1.5; }
+  .report-doc table { width: 100%; border-collapse: collapse; margin: 6pt 0 10pt; font-size: 9pt; line-height: 1.5;
+    page-break-inside: avoid; break-inside: avoid; }  /* 표는 쪽을 나누지 않는다 (2026-10-13 부대표님) */
   .report-doc thead { display: table-header-group; }
   .report-doc tr { page-break-inside: avoid; break-inside: avoid; }
   .report-doc th { background: var(--g); color: #fff; font-weight: 700; text-align: left;
