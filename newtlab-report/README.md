@@ -1,0 +1,26 @@
+# newtlab-report — 뉴트랩 보고서 양식 플러그인
+
+클로드 코드에서 보고서·기획안을 쓰면 회사 양식이 자동으로 적용됩니다.
+
+## 설치 (직원 터미널, 한 번)
+
+```
+claude plugin marketplace add newtlab-team/claude-plugins
+claude plugin install newtlab-report@newtlab
+pip3 install markdown
+```
+
+## 갱신
+
+```
+claude plugin update newtlab-report
+```
+
+## 들어 있는 것
+
+- `skills/report/SKILL.md` — 쓰는 순서 (종류 고르기 → 템플릿 → 규칙 → 검사 → PDF → 제출)
+- `skills/report/rules.md` — 문체·구조 규칙 11개 (정본)
+- `skills/report/templates/` — 원페이지 기획 · 보고서 템플릿
+- `scripts/md_to_a4_pdf.py` + `report.css` — A4 PDF 변환기와 공통 디자인
+
+정본 저장소는 뉴트랩 ERP `plugins/` 폴더입니다. 여기서 고치고 이 저장소로 내보냅니다.

@@ -1,0 +1,56 @@
+/* 뉴트랩 보고서 A4 공통 디자인 (정본 · 2026-10-13)
+   - md_to_a4_pdf.py가 이 파일을 읽어 PDF에 넣는다
+   - ERP 문서 화면(위키·보고서함)도 같은 파일을 가져와 인쇄 때 쓴다 → 종이로 나오면 둘이 같은 모양
+   - 규칙은 전부 .report-doc 안쪽, 인쇄 매체에서만 적용 (화면 모양은 각자) */
+@page { size: A4; margin: 15mm 14mm 14mm 14mm; }
+
+@media print {
+  .report-doc {
+    --g: #4A6022; --g2: #8D9B2F; --ink: #1a1a18; --mute: #5f6455;
+    --line: #d8dcc9; --bg-soft: #f5f7ee;
+    font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", -apple-system, sans-serif;
+    color: var(--ink); font-size: 10.2pt; line-height: 1.62;
+    max-width: 190mm; margin: 0 auto; padding: 0;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .report-doc *, .report-doc *::before, .report-doc *::after { box-sizing: border-box; }
+  .report-doc h1 {
+    font-size: 17.5pt; line-height: 1.3; margin: 0 0 7pt; letter-spacing: -.02em; font-weight: 800;
+    border-bottom: 2.5pt solid var(--g); padding-bottom: 7pt; color: var(--ink);
+  }
+  .report-doc h2 {
+    font-size: 12pt; margin: 20pt 0 8pt; padding-left: 9pt; font-weight: 800;
+    border-left: 3.5pt solid var(--g2); letter-spacing: -.01em; color: var(--ink);
+    page-break-after: avoid; break-after: avoid;
+  }
+  .report-doc h3 { font-size: 10.4pt; margin: 13pt 0 5pt; font-weight: 700; color: var(--g); page-break-after: avoid; }
+  .report-doc p { margin: 0 0 7pt; }
+  .report-doc hr { border: 0; border-top: .8pt solid var(--line); margin: 14pt 0; }
+  .report-doc table { width: 100%; border-collapse: collapse; margin: 6pt 0 10pt; font-size: 9pt; line-height: 1.5; }
+  .report-doc thead { display: table-header-group; }
+  .report-doc tr { page-break-inside: avoid; break-inside: avoid; }
+  .report-doc th { background: var(--g); color: #fff; font-weight: 700; text-align: left;
+    padding: 5pt 6pt; border: .6pt solid var(--g); font-size: 8.8pt; }
+  .report-doc td { padding: 5pt 6pt; border: .6pt solid var(--line); vertical-align: top; }
+  .report-doc tbody tr:nth-child(even) td { background: #fbfcf7; }
+  .report-doc blockquote {
+    margin: 9pt 0; padding: 9pt 12pt; border-left: 3pt solid var(--g2);
+    background: var(--bg-soft); border-radius: 0 3pt 3pt 0; color: var(--ink); font-size: inherit;
+    page-break-inside: avoid; break-inside: avoid;
+  }
+  .report-doc blockquote p:last-child { margin-bottom: 0; }
+  .report-doc ul, .report-doc ol { margin: 4pt 0 9pt; padding-left: 17pt; }
+  .report-doc li { margin-bottom: 4pt; }
+  .report-doc code { font-family: "SF Mono", Menlo, monospace; font-size: 8.4pt;
+    background: #eef1e4; padding: .5pt 3pt; border-radius: 2pt; }
+  .report-doc strong { font-weight: 700; }
+  .report-doc a { color: var(--g); word-break: break-all; text-decoration: none; }
+  .report-doc img { display: block; max-width: 100%; height: auto; margin: 10pt auto;
+    border: .6pt solid var(--line); border-radius: 3pt; page-break-inside: avoid; }
+
+  /* 머리말 `인쇄: 조밀표` — 표가 많은 명세 문서 */
+  .report-doc.compact table { font-size: 8.4pt; margin: 4pt 0 9pt; page-break-inside: avoid; break-inside: avoid; }
+  .report-doc.compact th, .report-doc.compact td { padding: 2.4pt 5pt; }
+  .report-doc.compact th { font-size: 8.2pt; }
+  .report-doc.compact h2 { margin: 12pt 0 6pt; }
+}

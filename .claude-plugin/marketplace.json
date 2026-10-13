@@ -1,0 +1,11 @@
+{
+  "name": "newtlab",
+  "owner": { "name": "뉴트랩", "email": "contact@newtlab.co.kr" },
+  "plugins": [
+    {
+      "name": "newtlab-report",
+      "source": "./newtlab-report",
+      "description": "뉴트랩 보고서·원페이지 기획 양식 — 두괄식, 짧은 문장(ASD-STE100 80%), AI 말투 없음, A4 공통 디자인과 PDF 변환기"
+    }
+  ]
+}
