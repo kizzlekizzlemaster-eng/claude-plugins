@@ -22,7 +22,7 @@ claude plugin update newtlab-report
 ## 들어 있는 것
 
 - `skills/report/SKILL.md` — 쓰는 순서 (종류 고르기 → 템플릿 → 규칙 → 검사 → PDF → 제출)
-- `skills/report/rules.md` — 문체·구조 규칙 13개 (정본)
+- `skills/report/rules.md` — 문체·구조 규칙 14개 (정본)
 - `skills/report/templates/` — 원페이지 기획 · 보고서 템플릿
 - `scripts/md_to_a4_pdf.py` + `report.css` — A4 PDF 변환기와 공통 디자인
 
